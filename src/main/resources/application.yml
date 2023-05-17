@@ -1,0 +1,14 @@
+spring:
+  #data for database connection
+  datasource:
+    url: jdbc:postgresql://localhost:5432/telros_db
+    username: postgres
+    password: 23343
+  jpa:
+    generate-ddl: true
+  #File configurations
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
