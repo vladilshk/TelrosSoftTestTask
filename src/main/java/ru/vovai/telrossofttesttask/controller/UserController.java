@@ -8,12 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ru.vovai.telrossofttesttask.controller.dto.UserDto;
+import ru.vovai.telrossofttesttask.controller.util.UserConverter;
 import ru.vovai.telrossofttesttask.model.User;
 import ru.vovai.telrossofttesttask.service.UserService;
 
 import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.List;
+
+import static ru.vovai.telrossofttesttask.controller.util.UserConverter.convertUserToDto;
 
 @RestController
 @RequestMapping("/user")
@@ -25,8 +29,8 @@ public class UserController {
     @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get all users")
-    public ResponseEntity<List<User>> getAllUser() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserDto>> getAllUser() {
+        return ResponseEntity.ok(userService.findAll().stream().map(UserConverter::convertUserToDto).toList());
     }
 
     @GetMapping("/{userId}")
@@ -34,7 +38,7 @@ public class UserController {
     public ResponseEntity<?> getUser(@PathVariable Long userId) {
         User updatedUser = userService.findById(userId);
         if (updatedUser != null) {
-            return ResponseEntity.ok().body(updatedUser);
+            return ResponseEntity.ok().body(convertUserToDto(updatedUser));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + userId + " not found.");
     }
@@ -43,7 +47,6 @@ public class UserController {
     @PostMapping("/create")
     @Operation(description = "Create a new user")
     public ResponseEntity<?> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        System.out.println(bindingResult.getFieldErrors());
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -59,7 +62,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Email or phone number is not unique.");
         }
         if (createdUser != null) {
-            return ResponseEntity.ok().body(createdUser);
+            return ResponseEntity.ok().body(convertUserToDto(createdUser));
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this data is already exist.");
     }
@@ -67,8 +70,21 @@ public class UserController {
 
     @PutMapping("/update/{userId}")
     @Operation(description = "Update user data")
-    public ResponseEntity<?> updateUser(@RequestBody @Valid User user, @PathVariable Long userId) {
-        User updatedUser = userService.updateUser(user, userId);
+    public ResponseEntity<?> updateUser(@RequestBody @Valid User user, @PathVariable Long userId, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessage = new StringBuilder();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMessage.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("\n");
+            }
+            // Вывод сообщения об ошибках валидации
+            return ResponseEntity.badRequest().body(errorMessage.toString());
+        }
+        User updatedUser;
+        try {
+            updatedUser = userService.createUser(user);
+        } catch (DataIntegrityViolationException e){
+            return ResponseEntity.badRequest().body("Email or phone number is not unique.");
+        }
         if (updatedUser != null) {
             return ResponseEntity.ok().body(updatedUser);
         }
