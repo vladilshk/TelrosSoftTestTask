@@ -32,8 +32,8 @@ public class UserService {
         return null;
     }
 
-    public User updateUser(User user) {
-        if (userRepository.findById(user.getId()).isPresent()) {
+    public User updateUser(User user, Long userId) {
+        if (userRepository.findById(userId).isPresent()) {
             User dbUser = userRepository.save(user);
             log.info("UserService: user with id = {} was updated", dbUser.getId());
             return dbUser;
@@ -42,8 +42,11 @@ public class UserService {
     }
 
     public Boolean deleteUser(Long userId) {
-        userRepository.deleteById(userId);
-        log.info("UserService: user with id = {} was deleted", userId);
-        return true;
+        if (userRepository.findById(userId).isPresent()) {
+            userRepository.deleteById(userId);
+            log.info("UserService: user with id = {} was deleted", userId);
+            return true;
+        }
+        return false;
     }
 }
