@@ -1,7 +1,6 @@
 package ru.vovai.telrossofttesttask.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;

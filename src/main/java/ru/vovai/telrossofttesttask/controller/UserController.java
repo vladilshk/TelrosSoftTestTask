@@ -1,10 +1,8 @@
 package ru.vovai.telrossofttesttask.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.vovai.telrossofttesttask.model.User;
@@ -37,7 +35,7 @@ public class UserController {
     }
 
 
-    @PostMapping()
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create a new user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
