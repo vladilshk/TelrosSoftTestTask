@@ -21,9 +21,12 @@ public class ImageController {
 
     @GetMapping("/{userId}")
     @Operation(description = "Get user photo")
-    public ResponseEntity<byte[]> getImageByUserId(@PathVariable Long userId){
+    public ResponseEntity<?> getImageByUserId(@PathVariable Long userId){
         Image image = imageService.getImage(userId);
-        return ResponseEntity.ok().contentType(MediaType.valueOf(image.getContentType())).body(image.getImageData());
+        if (image != null){
+            return ResponseEntity.ok().contentType(MediaType.valueOf(image.getContentType())).body(image.getImageData());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + userId + " don't have photo");
     }
 
 
@@ -34,7 +37,7 @@ public class ImageController {
         if (response != null){
             return ResponseEntity.ok().body(response);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id = " + userId + " is not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id = " + userId + " is not found. Or his photo have already been uploaded!");
     }
 
     @PutMapping("/update/{userId}")
@@ -50,9 +53,9 @@ public class ImageController {
     @DeleteMapping("/delete/{userId}")
     @Operation(description = "Delete user photo")
     public ResponseEntity<String> deleteImage(@PathVariable Long userId){
-        String response = imageService.deleteImage(userId);
-        if (response != null){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        Boolean idDeleted = imageService.deleteImage(userId);
+        if (idDeleted){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User with id " + userId + " photo have been successfully  deleted!");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id = " + userId + " is not found, or this user don't have photo to delete.");
     }

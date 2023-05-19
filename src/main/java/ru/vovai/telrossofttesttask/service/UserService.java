@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.vovai.telrossofttesttask.model.User;
 import ru.vovai.telrossofttesttask.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -32,11 +33,15 @@ public class UserService {
         return null;
     }
 
+    @Transactional
     public User updateUser(User user, Long userId) {
-        if (userRepository.findById(userId).isPresent()) {
-            User dbUser = userRepository.save(user);
-            log.info("UserService: user with id = {} was updated", dbUser.getId());
-            return dbUser;
+        User userFromDb = userRepository.findById(userId).orElse(null);
+        if (userFromDb != null) {
+            user.setId(userId);
+            user.setImage(user.getImage());
+            User updatedUser = userRepository.save(user);
+            log.info("UserService: user with id = {} was updated", updatedUser.getId());
+            return updatedUser;
         }
         return null;
     }

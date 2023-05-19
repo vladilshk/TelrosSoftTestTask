@@ -1,5 +1,6 @@
 package ru.vovai.telrossofttesttask.controller;
 
+import io.jsonwebtoken.SignatureException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,7 +15,6 @@ import ru.vovai.telrossofttesttask.model.User;
 import ru.vovai.telrossofttesttask.service.UserService;
 
 import javax.validation.Valid;
-import java.sql.SQLException;
 import java.util.List;
 
 import static ru.vovai.telrossofttesttask.controller.util.UserConverter.convertUserToDto;
@@ -30,6 +30,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get all users")
     public ResponseEntity<List<UserDto>> getAllUser() {
+        System.out.println();
+        try{
+
+        } catch (SignatureException e){
+
+        }
         return ResponseEntity.ok(userService.findAll().stream().map(UserConverter::convertUserToDto).toList());
     }
 
@@ -81,12 +87,12 @@ public class UserController {
         }
         User updatedUser;
         try {
-            updatedUser = userService.createUser(user);
+            updatedUser = userService.updateUser(user, userId);
         } catch (DataIntegrityViolationException e){
             return ResponseEntity.badRequest().body("Email or phone number is not unique.");
         }
         if (updatedUser != null) {
-            return ResponseEntity.ok().body(updatedUser);
+            return ResponseEntity.ok().body(convertUserToDto(updatedUser));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + user.getId() + " not found.");
     }

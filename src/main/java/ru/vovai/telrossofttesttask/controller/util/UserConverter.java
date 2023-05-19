@@ -7,6 +7,7 @@ public class UserConverter {
 
     public static UserDto convertUserToDto(User user){
         return UserDto.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .middleName(user.getMiddleName())

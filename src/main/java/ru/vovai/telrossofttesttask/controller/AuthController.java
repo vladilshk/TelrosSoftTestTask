@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) throws Exception {
+    public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())

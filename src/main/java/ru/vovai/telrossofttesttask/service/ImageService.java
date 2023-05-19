@@ -9,6 +9,7 @@ import ru.vovai.telrossofttesttask.model.User;
 import ru.vovai.telrossofttesttask.repository.ImageRepository;
 import ru.vovai.telrossofttesttask.util.ImageUtils;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public class ImageService {
         if (user == null) {
             return null;
         }
+        if (user.getImage() != null){
+            return null;
+        }
         imageRepository.save(convertFileToImage(file, user));
         return "Photo of user with id = " + userId + " uploaded successfully.";
     }
@@ -33,32 +37,40 @@ public class ImageService {
         if (user == null) {
             return null;
         }
-        //TODO: exception
-        Image dbImage = imageRepository.findByUser(user).orElseThrow();
+        Image dbImage = imageRepository.findByUser(user).orElse(null);
+        if (dbImage == null){
+            return null;
+        }
         dbImage.setImageData(ImageUtils.decompressImage(dbImage.getImageData()));
         return dbImage;
     }
 
+    @Transactional
     public String updateImage(MultipartFile file, Long userId) throws IOException {
         User user = userService.findById(userId);
         if (user == null) {
             return null;
         }
-        imageRepository.save(convertFileToImage(file, user));
-        return "Image updated successfully";
+        Image image = user.getImage();
+        if (image != null){
+            imageRepository.deleteById(user.getImage().getId());
+            imageRepository.save(convertFileToImage(file, user));
+            return "Image updated successfully";
+        }
+        return null;
     }
 
-    public String deleteImage(Long userId){
+    public Boolean deleteImage(Long userId){
         User user = userService.findById(userId);
         if (user == null){
-            return null;
+            return false;
         }
         Optional<Image> image = imageRepository.findByUser(user);
         if (image.isEmpty()){
             return null;
         }
         imageRepository.deleteById(image.get().getId());
-        return "Image deleted successfully";
+        return true;
     }
 
     private Image convertFileToImage(MultipartFile file, User user) throws IOException {

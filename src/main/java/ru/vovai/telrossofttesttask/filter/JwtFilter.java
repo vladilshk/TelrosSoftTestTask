@@ -1,4 +1,5 @@
 package ru.vovai.telrossofttesttask.filter;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = null;
         String userName = null;
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             token = authorizationHeader.substring(7);
             userName = jwtUtil.extractUsername(token);

@@ -23,7 +23,7 @@ public class UserContactsController {
     //NO need to make create method because contacts in my program are part of user
 
     @GetMapping("/{userId}")
-    @Operation(description = "Get user by id")
+    @Operation(description = "Get user contacts by id")
     public ResponseEntity<?> getUserContacts(@PathVariable Long userId) {
         UserContacts userContacts = userContactsService.findUserContacts(userId);
         if (userContacts != null) {
@@ -34,8 +34,9 @@ public class UserContactsController {
 
 
     @PutMapping("/update/{userId}")
-    @Operation(description = "Update user data")
+    @Operation(description = "Update user contacts")
     public ResponseEntity<?> updateUserContacts(@RequestBody @Valid UserContacts userContacts, @PathVariable Long userId, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -60,7 +61,7 @@ public class UserContactsController {
 
 
     @DeleteMapping("/delete/{userId}")
-    @Operation(description = "Delete user")
+    @Operation(description = "Delete user contacts")
     public ResponseEntity<String> deleteUserContacts(@PathVariable Long userId) {
         Boolean isDeleted = userContactsService.deleteUserContacts(userId);
         if (isDeleted){

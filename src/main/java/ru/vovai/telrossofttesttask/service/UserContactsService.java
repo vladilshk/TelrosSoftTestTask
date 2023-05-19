@@ -26,7 +26,7 @@ public class UserContactsService {
     public UserContacts updateUserContacts(UserContacts userContacts, Long userId){
         User user = userService.findById(userId);
         if (user != null) {
-            user.setEmail(userContacts.getPhoneNumber());
+            user.setEmail(userContacts.getEmail());
             user.setPhoneNumber(userContacts.getPhoneNumber());
             userService.updateUser(user, userId);
             return userContacts;
@@ -39,6 +39,7 @@ public class UserContactsService {
         if (user != null) {
             user.setEmail(null);
             user.setPhoneNumber(null);
+            userService.updateUser(user, userId);
             return true;
         }
         return false;
